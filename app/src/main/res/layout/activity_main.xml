@@ -7,6 +7,7 @@
     tools:context=".MainActivity">
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -17,23 +18,25 @@
         <CalendarView
             android:id="@+id/calendar"
             android:layout_width="411dp"
-            android:layout_height="371dp" />
+            android:layout_height="315dp" />
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="285dp"
+            android:fillViewport="true">
 
-            <LinearLayout
+            <ListView
+                android:id="@+id/dailySchedule"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/dailySchedule"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-            </LinearLayout>
+                android:layout_height="match_parent" />
         </ScrollView>
+
+        <Button
+            android:id="@+id/addTaskButton"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:onClick="goToCreateTaskLayout"
+            android:text="@string/button_name" />
 
     </LinearLayout>
 

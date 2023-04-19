@@ -12,13 +12,13 @@ public interface DaysDao {
     @Query("SELECT * FROM Days WHERE uid IN (:userIds)")
     List<Days> loadAllByIds(int[] userIds);
 
-    @Query("SELECT * FROM Days WHERE name LIKE :first")
-    Days findByName(String first);
+    @Query("SELECT * FROM Days WHERE dateFinish > :time AND dateStart < (:time + 86400000)")
+    List<Days> findByDay(long time);
 
     @Insert
-    void insertAll(Days... users);
+    void insert(Days... day);
 
     @Delete
-    void delete(Days user);
+    void delete(Days day);
 }
 

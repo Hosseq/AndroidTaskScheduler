@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">AndroidTaskSCheduler</string>
+    <string name="button_name">Add New Task</string>
+    <string name="enter_name">Enter Name</string>
+    <string name="enter_description">Enter Description</string>
+    <string name="date_of_start">Date of start</string>
+    <string name="date_of_end">Date of end</string>
 </resources>
