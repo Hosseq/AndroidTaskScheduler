@@ -18,17 +18,17 @@
         <CalendarView
             android:id="@+id/calendar"
             android:layout_width="411dp"
-            android:layout_height="315dp" />
+            android:layout_height="wrap_content" />
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="285dp"
+            android:layout_height="327dp"
             android:fillViewport="true">
 
             <ListView
                 android:id="@+id/dailySchedule"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="wrap_content" />
         </ScrollView>
 
         <Button

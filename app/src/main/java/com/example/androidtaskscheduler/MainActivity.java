@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
     CalendarView calendar;
     ListView dailySchedule;
-    DaysDao daysDao;
+    static public DaysDao daysDao;
     Button addTaskButton;
 
     @Override
