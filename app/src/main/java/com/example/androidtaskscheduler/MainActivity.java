@@ -1,14 +1,17 @@
 package com.example.androidtaskscheduler;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CalendarView;
@@ -35,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
     ListView dailySchedule;
     static public DaysDao daysDao;
     Button addTaskButton;
+    String[] tasksByHours;
+    Days[] currentDayTasksByHours;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,28 +61,43 @@ public class MainActivity extends AppCompatActivity {
         AsyncTask.execute(() -> daysDao.insert(day));
 
         //Set-up list with tasks
-        String[] tasksByHours = new String[24];
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+        tasksByHours = new String[24];
+        currentDayTasksByHours = new Days[24];
+
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(
                 this,
                 android.R.layout.simple_list_item_1,
                 tasksByHours
         );
 
 
+        dailySchedule.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView parent, View v, int position, long id) {
+
+                Days day = currentDayTasksByHours[(int) id];
+
+                if(day == null) { return; }
+
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("Task Description")
+                        .setMessage("Name:\t" + day.getName() + "\n" +
+                                    "Description:\t" + day.getDescription() + "\n" +
+                                    "Date of start:\t" + day.getStartDate() + "\n" +
+                                    "Date of finish:\t" + day.getFinishDate())
+                        .show();
+            }});
+
+
+
+
 
         calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView calendarView, int i, int i1, int i2) {
-
-                //Timestamp ts = new Timestamp(calendar.getDate());
-                //Toast.makeText(getApplicationContext(),ts.toString(),Toast.LENGTH_LONG).show();
-                //Toast.makeText(getApplicationContext(),String.valueOf(test.name),Toast.LENGTH_LONG).show();
-
                 List<Days> currentDayTasks = daysDao.getAll();
 
-                //LocalDate localDate = Instant.ofEpochMilli(dayTime).atZone(ZoneId.of("UTC")).toLocalDate();
-                // dayTime = localDate.atStartOfDay(ZoneId.of("UTC")).toInstant().toEpochMilli();
+
                 long dayTime = OffsetDateTime.of(i, i1 + 1, i2, 0, 0, 0, 0, ZoneOffset.UTC)
                         .toInstant()
                         .toEpochMilli();
@@ -86,8 +106,11 @@ public class MainActivity extends AppCompatActivity {
                     tasksByHours[j] = j + ":00 \n";
 
                     for (Days day: currentDayTasks) {
-                        if((dayTime + (3600000 * j)) <= day.dateStart && day.dateStart <= (dayTime + (3600000 * (j + 1)))) {
-                            tasksByHours[j] += day.name + "\n Date start: " + new Timestamp(day.dateStart) + "\n Date end: " + new Timestamp(day.dateFinish) + "\n";
+                        if((dayTime + (3600000 * j)) <= day.getStartDate() && day.getFinishDate() <= (dayTime + (3600000 * (j + 1)))) {
+                            tasksByHours[j] += day.getName() + "\n Date start: " + new Timestamp(day.getStartDate()) + "\n Date end: " + new Timestamp(day.getFinishDate()) + "\n";
+
+                            currentDayTasksByHours[j] = day;
+
                         }
                     }
                 }
@@ -96,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
 
     public void goToCreateTaskLayout(View view) {
         Intent intent = new Intent(this, CreateTask.class);

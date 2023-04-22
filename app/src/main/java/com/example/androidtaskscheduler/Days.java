@@ -27,4 +27,18 @@ public class Days {
         this.dateStart = dateStart;
         this.dateFinish = dateFinish;
     }
+
+    public String getName() {
+        return name;
+    }
+    public String getDescription() {
+        return description;
+    }
+    public long getStartDate() {
+        return dateStart;
+    }
+    public long getFinishDate() {
+        return dateFinish;
+    }
+
 }
