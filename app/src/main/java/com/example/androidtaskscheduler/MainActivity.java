@@ -1,15 +1,6 @@
 package com.example.androidtaskscheduler;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.room.Room;
-import java.util.List;
-
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -17,31 +8,26 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.room.Room;
 
 import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.lang.Thread;
-
-import io.reactivex.rxjava3.core.Single;
 
 public class MainActivity extends AppCompatActivity {
 
     CalendarView calendar;
     ListView dailySchedule;
-    static public DaysDao daysDao;
+    static public TasksDao tasksDao;
     Button addTaskButton;
     String[] tasksByHours;
-    ArrayList<List<Days>> currentDayTasksByHours;
+    ArrayList<List<Tasks>> currentDayTasksByHours;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,18 +42,18 @@ public class MainActivity extends AppCompatActivity {
         //Set-up database
         AppDatabase db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "database-name").fallbackToDestructiveMigration().allowMainThreadQueries().build();
-        daysDao = db.userDao();
+        tasksDao = db.tasksDao();
 
         //Set-up list with tasks
-        tasksByHours = new String[24];                          //Array for output in ViewList by hours
-        currentDayTasksByHours = new ArrayList<List<Days>>(24);                  //Array for detailed description by hours
-        for(int i = 0; i < 24; i++)
-        {
-            currentDayTasksByHours.add(new ArrayList<Days>());
+        tasksByHours = new String[24];                                                        //Array for output in ViewList by hours
+        currentDayTasksByHours = new ArrayList<List<Tasks>>(24);                  //Array for detailed description by hours
+        for (int i = 0; i < 24; i++) {
+            currentDayTasksByHours.add(new ArrayList<Tasks>());
         }
 
 
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+        //Adapter for ListView
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
                 this,
                 android.R.layout.simple_list_item_1,
                 tasksByHours
@@ -77,53 +63,57 @@ public class MainActivity extends AppCompatActivity {
         dailySchedule.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView parent, View v, int position, long id) {
                 String DialogMessage = "";
+                List<Tasks> dayList = currentDayTasksByHours.get((int) id);
 
-                List<Days> innerList = currentDayTasksByHours.get((int) id);
-
-                for (Days day:
-                        innerList) {
-                        if(day == null) {
-                            break;
-                        } else {
-                            DialogMessage +=    "Name:\t" + day.getName() + "\n" +
-                                                "Description:\t" + day.getDescription() + "\n" +
-                                                "Date of start:\t" + day.getStartDate() + "\n" +
-                                                "Date of finish:\t" + day.getFinishDate() + "\n\n";
-                        }
-
-
+                for (Tasks task : dayList) {
+                    if (task == null) {
+                        break;
+                    } else {
+                        DialogMessage += "Name:\t" + task.getName() + "\n" +
+                                "Description:\t" + task.getDescription() + "\n" +
+                                "Date of start:\t" + task.getStartDate() + "\n" +
+                                "Date of finish:\t" + task.getFinishDate() + "\n\n";
+                    }
                 }
 
-                if(DialogMessage == "") { return; }
+                if (DialogMessage.equals("")) {
+                    return;
+                }     //if no tasks
 
                 new AlertDialog.Builder(MainActivity.this)
                         .setTitle("Task Description")
                         .setMessage(DialogMessage)
                         .setCancelable(true)
                         .show();
-            }});
+            }
+        });
 
 
-
-
-
+        //Show list of tasks by clicking on a date in calendar
         calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView calendarView, int i, int i1, int i2) {
+                //Convert calendar date to milliseconds
                 long dayTime = OffsetDateTime.of(i, i1 + 1, i2, 0, 0, 0, 0, ZoneOffset.UTC)
                         .toInstant()
                         .toEpochMilli();
 
-                List<Days> currentDayTasks = daysDao.findByDay(dayTime);
+                //Get tasks from database
+                List<Tasks> currentDayTasks = tasksDao.findByDay(dayTime);
 
-                for(int j = 0; j < tasksByHours.length; j++) {
+                //Output for Listview
+                for (int j = 0; j < tasksByHours.length; j++) {
                     tasksByHours[j] = j + ":00 \n";
 
-                    for (Days day: currentDayTasks) {
-                        if((dayTime + (3600000 * j)) <= day.getStartDate() && day.getFinishDate() <= (dayTime + (3600000 * (j + 1)))) {
-                            tasksByHours[j] += day.getName() + "\n Date start: " + new Timestamp(day.getStartDate()) + "\n Date end: " + new Timestamp(day.getFinishDate()) + "\n";
+                    for (Tasks task : currentDayTasks) {
+                        //if between hours(1:00-2:00)
+                        if ((dayTime + (3600000 * j)) < task.getStartDate() && task.getStartDate() <= (dayTime + (3600000 * (j + 1)))) {
+                            tasksByHours[j] += task.getName() +
+                                    "\n Date start: " + new Timestamp(task.getStartDate()) +
+                                    "\n Date end: " + new Timestamp(task.getFinishDate()) + "\n";
 
-                            currentDayTasksByHours.get(j).add(day);
+                            //Save day for detailed description
+                            currentDayTasksByHours.get(j).add(task);
 
                         }
                     }

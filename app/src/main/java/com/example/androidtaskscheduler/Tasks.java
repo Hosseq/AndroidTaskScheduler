@@ -1,12 +1,11 @@
 package com.example.androidtaskscheduler;
 
 import androidx.room.*;
-import java.sql.Timestamp;
 
 @Entity
-public class Days {
+public class Tasks {
     @PrimaryKey(autoGenerate = true)
-    public int uid;
+    public int id;
 
     @ColumnInfo(name = "name")
     public String name;
@@ -20,7 +19,7 @@ public class Days {
     @ColumnInfo(name = "dateFinish")
     public long dateFinish;
 
-    Days(String name, String description, long dateStart, long dateFinish)
+    Tasks(String name, String description, long dateStart, long dateFinish)
     {
         this.name = name;
         this.description = description;
@@ -28,6 +27,7 @@ public class Days {
         this.dateFinish = dateFinish;
     }
 
+    //Getters
     public String getName() {
         return name;
     }
