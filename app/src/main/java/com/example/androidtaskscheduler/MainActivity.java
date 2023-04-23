@@ -95,12 +95,11 @@ public class MainActivity extends AppCompatActivity {
         calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView calendarView, int i, int i1, int i2) {
-                List<Days> currentDayTasks = daysDao.getAll();
-
-
                 long dayTime = OffsetDateTime.of(i, i1 + 1, i2, 0, 0, 0, 0, ZoneOffset.UTC)
                         .toInstant()
                         .toEpochMilli();
+
+                List<Days> currentDayTasks = daysDao.findByDay(dayTime);
 
                 for(int j = 0; j < tasksByHours.length; j++) {
                     tasksByHours[j] = j + ":00 \n";

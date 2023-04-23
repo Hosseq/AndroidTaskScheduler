@@ -21,8 +21,7 @@
             android:id="@+id/taskName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/enter_name"
-            android:textAlignment="center" />
+            android:hint="@string/enter_name" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -55,9 +54,8 @@
         android:ems="10"
         android:inputType="date"
         android:minHeight="48dp"
-        android:text="@string/date_of_end"
+        android:text="@string/date_of_end_hint"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
@@ -71,9 +69,8 @@
         android:ems="10"
         android:inputType="date"
         android:minHeight="48dp"
-        android:text="@string/date_of_end"
+        android:text="@string/date_of_start_hint"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
